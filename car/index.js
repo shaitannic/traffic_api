@@ -2,10 +2,10 @@ const database = require('../db');
 
 class Car {
     constructor() {
-        this.speed = 0;
+        this.speed = 30;
         this.acceleration = 0;
         this.coordinate = [0,0];
-        this.road = 0;
+        this.road_id = 0;
     }
 
     save() {
@@ -13,7 +13,7 @@ class Car {
             speed: this.speed,
             acceleration: this.acceleration,
             coordinate: this.coordinate,
-            road: this.road
+            road_id: this.road_id
         }
     }
 

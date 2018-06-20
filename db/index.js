@@ -28,6 +28,21 @@ class Database {
         return await this.pool.query("SELECT * FROM users");
     }
 
+    async saveRoad(road) {
+        const keys = Object.keys(road);
+        const values = Object.values(road);
+        const query = `INSERT INTO roads (${keys.join(', ')}) VALUES ('${values.join("', '")}')`;
+
+        return await this.pool.query(query).then(
+            result => {
+                console.log('success');
+                console.log(result);
+            },
+            error => {
+                console.log(error);
+            });
+    }
+
     async end() {
         await this.pool.end();
     }

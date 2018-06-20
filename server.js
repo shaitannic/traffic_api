@@ -1,13 +1,10 @@
 const express       = require('express');
 const bodyParser    = require('body-parser');
-const { database }  = require('./db');
-// const Car           = require('./car');
 const app           = express();
+const port          = 8000;
 
-// var Car             = require('./car');
-// var InitHandler     = require('./init-handler');
-
-const port = 8000;
+const { database }      = require('./db');
+const { initHandler }   = require('./init-handler');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.listen(port, () => console.log('We are live on ' + port));
@@ -21,8 +18,9 @@ app.get('/cars', (req, res) => {
     // console.log(new Car(database).all)
 });
 
+/*
 database.users().then((users)=> {
     console.log(users.rows);
-});
+});*/
 
-database.end();
+initHandler.init();

@@ -1,24 +1,28 @@
 const express       = require('express');
-const MongoClient   = require('mongodb').MongoClient;
 const bodyParser    = require('body-parser');
-const db            = require('./config/db');
+const { database }  = require('./db');
+// const Car           = require('./car');
 const app           = express();
-var Auto = require('./auto');
+
+// var Car             = require('./car');
+// var InitHandler     = require('./init-handler');
+
 const port = 8000;
 
-app.use(bodyParser.urlencoded({ extended: true }));  
+app.use(bodyParser.urlencoded({ extended: true }));
+app.listen(port, () => console.log('We are live on ' + port));
 
-MongoClient.connect(db.url, (err, client) => {
-    if (err) return console.log(err)
-
-    var db = client.db('traffic_optimization');
-
-    app.listen(port, () => console.log('We are live on ' + port));
-
-    require('./routes')(app, db);
+app.post('/cars', (req, res) => {
+    // let car = new Car(database);
+    // car.save();
 })
 
-var auto = new Auto('ddd');
-/*auto.hello('me');
-var fuck = auto.fuck;
-console.log(fuck);*/
+app.get('/cars', (req, res) => {
+    // console.log(new Car(database).all)
+});
+
+database.users().then((users)=> {
+    console.log(users.rows);
+});
+
+database.end();

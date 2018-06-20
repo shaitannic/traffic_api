@@ -1,24 +1,40 @@
 const express       = require('express');
-const MongoClient   = require('mongodb').MongoClient;
 const bodyParser    = require('body-parser');
-const database      = require('./database');
 const app           = express();
-var Auto = require('./auto');
-const port = 8000;
+const port          = 8000;
 
-app.use(bodyParser.urlencoded({ extended: true }));  
+const { database }      = require('./db');
+const { initHandler }   = require('./init-handler');
 
-MongoClient.connect(database.url, (err, client) => {
-    if (err) return console.log(err)
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+});
 
-    var database = client.database('traffic_optimization');
 
-    app.listen(port, () => console.log('We are live on ' + port));
 
-    require('./routes')(app, database);
+app.listen(port, () => console.log('We are live on ' + port));
+
+app.get('/users', (req, res) => {
+    res.send({'name': 'ddd'});
 })
 
-var auto = new Auto('ddd');
-/*auto.hello('me');
-var fuck = auto.fuck;
-console.log(fuck);*/
+app.post('/polyline', (req, res) => {
+    console.log(req.body);
+    res.send({ result: true });
+})
+
+app.get('/cars', (req, res) => {
+    // console.log(new Car(database).all)
+});
+
+/*
+database.users().then((users)=> {
+    console.log(users.rows);
+});*/
+
+// initHandler.init();

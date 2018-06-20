@@ -1,5 +1,8 @@
-const { BehaviorSubject } = require('rxjs');
-const { takeUntil } = require('rxjs/Operator');
+const { BehaviorSubject }   = require('rxjs');
+const { takeUntil }         = require('rxjs/Operator');
+const { database }          = require('../db');
+const Car = require('../car');
+const Road = require('../road');
 
 const step = 0.3;
 
@@ -9,20 +12,31 @@ class InitHandler {
     }
 
     get isRunning() {
-        return this.currentTime.getValue() < 11;
+        return this.currentTime.getValue() <= 10;
     }
 
     async init(items) {
-        while (this.isRunning) {
+        // while (this.isRunning) {
             await this.delayedLog();
             // todo добавить асинхронные вычисления
-            this.goToNextStep();
-        }
+            // this.goToNextStep();
+        // }
     }
 
     async delayedLog() {
-        console.log(this.currentTime.getValue());
-        return new Promise(resolve => setTimeout(resolve, 1000));
+        // console.log(this.currentTime.getValue());
+
+        const params = {
+            startCoordinate: [1, 2],
+            endCoordinate: [10, 15],
+            countOfBands: 3,
+            inputStream: 400,
+            outputStream: 800
+        }
+        this.road = new Road(params);
+        this.road.save();
+
+        // return new Promise(resolve => setTimeout(resolve, 1000));
     }
 
     goToNextStep() {
@@ -30,4 +44,6 @@ class InitHandler {
     }
 }
 
-module.exports = InitHandler;
+module.exports = {
+    initHandler: new InitHandler()
+};

@@ -7,11 +7,25 @@ const { database }      = require('./db');
 const { initHandler }   = require('./init-handler');
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+});
+
+
+
 app.listen(port, () => console.log('We are live on ' + port));
 
-app.post('/cars', (req, res) => {
-    // let car = new Car(database);
-    // car.save();
+app.get('/users', (req, res) => {
+    res.send({'name': 'ddd'});
+})
+
+app.post('/polyline', (req, res) => {
+    console.log(req.body);
+    res.send({ result: true });
 })
 
 app.get('/cars', (req, res) => {
@@ -23,4 +37,4 @@ database.users().then((users)=> {
     console.log(users.rows);
 });*/
 
-initHandler.init();
+// initHandler.init();

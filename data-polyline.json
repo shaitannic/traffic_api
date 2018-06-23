@@ -1,0 +1,43 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": 1,
+        "options": {"strokeWidth": 3},
+        "properties": {"balloonContent": "Содержимое балуна", "hintContent": "Текст подсказки"},
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+                55.923304138377226,
+                37.322845455177394
+            ],
+            [
+                55.98494172904744,
+                37.732086177833665
+            ]
+          ]
+        }
+      },
+      {
+        "type": "Feature",
+        "id": 2,
+        "options": {"strokeWidth": 3},
+        "properties": {"balloonContent": "Содержимое балуна", "hintContent": "Текст подсказки"},
+        "geometry": {
+          "type": "LineString",
+          "coordinates": [
+            [
+                55.77497148909968,
+                37.278900142677415
+            ],
+            [
+                55.6959383664173,
+                37.59750365830241
+            ]
+          ]
+        }
+      }
+    ]
+  }

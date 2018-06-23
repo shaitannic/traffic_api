@@ -1,5 +1,5 @@
 CREATE TABLE polyline (
-    id                      int NOT NULL,
+    objectId                int NOT NULL,
     geometry_coordinates    numeric[],
     count_of_bands          int,
     input_stream            int,

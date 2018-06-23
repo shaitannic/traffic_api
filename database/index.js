@@ -1,4 +1,4 @@
-const DB_NAME = 'traffic_optimization';
+const DB_NAME = 'traffic';
 
 module.exports = {
     name: DB_NAME,

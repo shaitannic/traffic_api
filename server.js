@@ -1,21 +1,21 @@
 const express       = require('express');
 const MongoClient   = require('mongodb').MongoClient;
 const bodyParser    = require('body-parser');
-const db            = require('./config/db');
+const database      = require('./database');
 const app           = express();
 var Auto = require('./auto');
 const port = 8000;
 
 app.use(bodyParser.urlencoded({ extended: true }));  
 
-MongoClient.connect(db.url, (err, client) => {
+MongoClient.connect(database.url, (err, client) => {
     if (err) return console.log(err)
 
-    var db = client.db('traffic_optimization');
+    var database = client.database('traffic_optimization');
 
     app.listen(port, () => console.log('We are live on ' + port));
 
-    require('./routes')(app, db);
+    require('./routes')(app, database);
 })
 
 var auto = new Auto('ddd');

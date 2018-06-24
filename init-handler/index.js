@@ -18,11 +18,12 @@ class InitHandler {
         // await new Car({id: 1, polylineId: 1, coordinates: [1,2], speed: 50, acceleration: 3, newPolyline: false }).save();
         // await new Car({id: 2, polylineId: 2, coordinates: [1,2], speed: 60, acceleration: 3, newPolyline: false }).save();
 
-        for (let i = 1; i < 4; i = i + 1) {
+        while (this.isRunning) {
             await new Promise(resolve => {
                 Car.getAll().then(cars => {
                     cars.forEach(async car => {
                         await this.updateState(car);
+                        this.goToNextTimeStep();
                         resolve(true);
                     });
                 });

@@ -2,20 +2,30 @@ const { database } = require('../db');
 
 class Car {
     constructor(params) {
-        this.polylineId = params.polylineId;
+        this.id = params.id;
+        this.polylineId = params.polylineId || params.polyline_id;
         this.coordinates = params.coordinates;
         this.speed = params.speed;
         this.acceleration = params.acceleration;
-        this.newPolyline = params.newPolyline;
+        this.newPolyline = params.newPolyline || params.new_polyline === 't';
     }
 
     static getAll () {
-        return database.cars();
+        return new Promise(resolve => {
+            resolve(database.cars().then(data => {
+                let cars = [];
+                data.rows.forEach(params => {
+                    cars.push(new Car(params));
+                })
+                return new Promise(resolve => resolve(cars));
+            }))
+        })
     }
 
     /** @desc Сериализатор для БД */
     serialize(params) {
         const object = {
+            id: params.id,
             polyline_id: params.polylineId,
             coordinates: `{${params.coordinates.join(',')}}`,
             speed: params.speed,
@@ -37,6 +47,10 @@ class Car {
         const serializedObject = this.serialize(this);
         return database.updateCar(serializedObject);
     }
+
+    /*async get currentPolyline() {
+        return await this.pool.query(`SELECT * FROM polylines WHERE object_id = ${this.polylineId}`);
+    }*/
 
     /** @desc Проверка. Автомобиль повернул на новый перегон */
     get isTurnedToNewPolyline() {
@@ -60,7 +74,7 @@ class Car {
 
     /** @desc Проверка. Можно ускориться (увеличить скорость) */
     get isCanAccelarate() {
-        return false;
+        return true;
     }
 
     /*

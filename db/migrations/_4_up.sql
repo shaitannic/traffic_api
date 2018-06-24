@@ -1,8 +1,9 @@
 CREATE TABLE cars (
+    id                  int NOT NULL,
     polyline_id         int NOT NULL,
     coordinates         numeric[],
-    speed               int,
-    acceleration        int,
+    speed               numeric,
+    acceleration        numeric,
     new_polyline        boolean
 );
 

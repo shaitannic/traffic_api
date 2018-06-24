@@ -4,62 +4,61 @@ const { database }          = require('../db');
 const Car = require('../car');
 const Road = require('../road');
 
-const step = 0.3;
+const step = 1.1;
 
 class InitHandler {
     constructor() {
-        this.currentTime = new BehaviorSubject(1.8);
+        this.currentTime = new BehaviorSubject(0);
         this.cars = [];
     }
 
     /** @desc инициализация автомата */
     async init(items) {
-        await database.clearTables();
-        // создаем тестовый автомобиль
-        await new Car({polylineId: 1, coordinates: [1,2], speed: 50, acceleration: 0, newPolyline: false }).save();
+        // await database.clearTables();
+        // await new Car({id: 1, polylineId: 1, coordinates: [1,2], speed: 50, acceleration: 3, newPolyline: false }).save();
+        // await new Car({id: 2, polylineId: 2, coordinates: [1,2], speed: 60, acceleration: 3, newPolyline: false }).save();
 
-        while (this.isRunning) {
-            if (this.isNeedToCreateNewCar) {
-                await new Car({polylineId: 1, coordinates: [1,2], speed: 50, acceleration: 0 }).save();
-            }
-
-            await Car.getAll().then(data => this.cars = data.rows);
-
-            this.cars.forEach(car => {
-                this.updateState(car);
+        for (let i = 1; i < 4; i = i + 1) {
+            await new Promise(resolve => {
+                Car.getAll().then(cars => {
+                    cars.forEach(async car => {
+                        await this.updateState(car);
+                        resolve(true);
+                    });
+                });
             })
-/*
-            console.log(this.cars);
-            console.log('---');
-            await this.operate();
-            console.log(this.currentTime.getValue());*/
-            this.goToNextTimeStep()
         }
     }
 
     /** @desc обновить состояние автомобиля */
-    async updateState(car) {
-
-        new Promise(resolve => resolve(car))
-        .then(car => this.checkIsTurnedToNewPolyline(car))
-        .then(car => this.checkIsNearToCrossroad(car))
-        .then(car => this.checkIsNeedToChangePolyline(car))
-        .then(car => this.checkIsCanAccelerate(car))
-        .then(car => console.log(car))
-        // .then(car => car.update())
+    updateState(car) {
+        return new Promise(resolve => {
+            resolve(
+                new Promise(resolve => resolve(car))
+            // .then(car => this.checkIsTurnedToNewPolyline(car))
+            // .then(car => this.isThereCarAhead(ca))
+            // .then(car => this.checkIsNearToCrossroad(car))
+            // .then(car => this.checkIsNeedToChangePolyline(car))
+            .then(car => this.checkIsCanAccelerate(car))
+            .then(car => car.update()))
+        })
+        
     }
 
     /** @desc Проверить. Автомобиль повернул на новый перегон */
     checkIsTurnedToNewPolyline(car) {
         if (car.isTurnedToNewPolyline) {
-            // change car params. For example
-            // car.speed = car.speed + 2;
-            // car.polyline_id = 10;
+
         }
         
-        console.log(car);
         car.polyline_id = car.polyline_id + 10;
         return new Promise(resolve => resolve(car))
+    }
+
+    isThereCarAhead(car) {
+        if (car.isThereCarAhead) {
+
+        }
     }
 
     checkIsNearToCrossroad(car) {
@@ -67,7 +66,6 @@ class InitHandler {
             // todo something
         }
 
-        console.log(car);
         car.polyline_id = car.polyline_id + 10;
         return new Promise(resolve => resolve(car));
     }
@@ -77,17 +75,16 @@ class InitHandler {
             // todo something
         }
 
-        console.log(car);
         car.polyline_id = car.polyline_id + 10;
         return new Promise(resolve => resolve(car));
     }
 
     checkIsCanAccelerate(car) {
         if (car.isCanAccelarate) {
-            // todo something
+            car.acceleration = 3;
+            car.speed = Number(car.speed) + car.acceleration * 0.3;
         }
-        console.log(car);
-        car.polyline_id = car.polyline_id + 10;
+        
         return new Promise(resolve => resolve(car));
     }
 

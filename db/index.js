@@ -15,23 +15,18 @@ class Database {
         });
     }
 
-    async test() {
-        const res = await this.pool.query('SELECT $1::text as message', ['Hello world!'])
-        console.log(res.rows[0].message) // Hello world!
-    }
-
-    async addUser() {
-        await this.pool.query("INSERT into users (name, count) VALUES ('Andrew', 1)");
-    }
-
-    async users() {
-        return await this.pool.query("SELECT * FROM users");
-    }
-
     saveCar(car) {
         const keys = Object.keys(car);
         const values = Object.values(car);
         const query = `INSERT INTO cars (${keys.join(', ')}) VALUES ('${values.join("', '")}')`;
+
+        return this.pool.query(query);
+    }
+
+    updateCar(car) {
+        const keys = Object.keys(car);
+        const values = Object.values(car);
+        const query = `UPDATE cars SET (${keys.join(', ')}) = ('${values.join("', '")}') WHERE id = ${car.id}`;
 
         return this.pool.query(query);
     }

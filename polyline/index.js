@@ -1,9 +1,10 @@
 const { database } = require('../db');
 
-class Road {
+class Polyline {
     constructor(params) {
-        this.startCoordinate = params.startCoordinate;
-        this.endCoordinate = params.endCoordinate;
+        this.objectId = params.objectId;
+        this.length = params.length;
+        this.geometryCoordinates = params.geometryCoordinates;
         this.countOfBands = params.countOfBands;
         this.inputStream = params.inputStream;
         this.outputStream = params.outputStream;
@@ -25,8 +26,8 @@ class Road {
     /** @desc Сохранение в БД */
     save() {
         const serializedObject = this.serialize(this);
-        database.saveRoad(serializedObject);
+        database.savePolyline(serializedObject);
     }
 }
 
-module.exports = Road;
+module.exports = Polyline;

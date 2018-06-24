@@ -6,6 +6,7 @@ class Car {
         this.polylineId = params.polylineId || params.polyline_id;
         this.coordinates = params.coordinates;
         this.speed = params.speed;
+        this.position = params.position;
         this.acceleration = params.acceleration;
         this.newPolyline = params.newPolyline || params.new_polyline === 't';
     }
@@ -29,6 +30,7 @@ class Car {
             polyline_id: params.polylineId,
             coordinates: `{${params.coordinates.join(',')}}`,
             speed: params.speed,
+            position: params.position,
             acceleration: params.acceleration,
             new_polyline: params.newPolyline
         }

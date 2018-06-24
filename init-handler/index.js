@@ -4,7 +4,7 @@ const { database }          = require('../db');
 const Car = require('../car');
 const Polyline = require('../polyline');
 
-const step = 1.1;
+const step = 1;
 
 class InitHandler {
     constructor() {
@@ -17,7 +17,7 @@ class InitHandler {
             length: 100,
             geometryCoordinates: [1,2],
             countOfBands: 3,
-            inputStream: 300,
+            inputStream: 2300,
             outputStream: 500
         });
 
@@ -54,10 +54,10 @@ class InitHandler {
     /** @desc инициализация автомата */
     async init(items) {
         await database.clearTables();
-        await new Car({id: this.carId += 1, polylineId: 1, coordinates: [1,2], speed: 60, acceleration: 3, newPolyline: false }).save();
-        await new Car({id: this.carId += 1, polylineId: 2, coordinates: [1,2], speed: 60, acceleration: 3, newPolyline: false }).save();
-        await new Car({id: this.carId += 1, polylineId: 3, coordinates: [1,2], speed: 60, acceleration: 3, newPolyline: false }).save();
-        await new Car({id: this.carId += 1, polylineId: 4, coordinates: [1,2], speed: 60, acceleration: 3, newPolyline: false }).save();
+        await new Car({id: this.carId += 1, polylineId: 1, coordinates: [1,2], speed: 60, position: 0, acceleration: 3, newPolyline: false }).save();
+        await new Car({id: this.carId += 1, polylineId: 2, coordinates: [1,2], speed: 60, position: 0, acceleration: 3, newPolyline: false }).save();
+        await new Car({id: this.carId += 1, polylineId: 3, coordinates: [1,2], speed: 60, position: 0, acceleration: 3, newPolyline: false }).save();
+        await new Car({id: this.carId += 1, polylineId: 4, coordinates: [1,2], speed: 60, position: 0, acceleration: 3, newPolyline: false }).save();
 
         while (this.isRunning) {
             await this.createCars();
@@ -124,7 +124,8 @@ class InitHandler {
 
     checkIsCanAccelerate(car) {
         if (car.isCanAccelarate) {
-            car.acceleration = 3;
+            const time = this.currentTime.getValue();
+            car.position = Number(car.position) + Number(car.speed) * time + Number(car.acceleration) * time * time / 2;
             car.speed = Number(car.speed) + car.acceleration * 0.3;
         }
         
@@ -145,8 +146,8 @@ class InitHandler {
             this.polylines.forEach(async polyline => {
                 const interval = ~~(3600 / polyline.inputStream);
 
-                if (this.isNeedToCreateNewCar(interval)) {
-                    await new Car({id: this.carId += 1, polylineId: polyline.objectId, coordinates: [1,2], speed: 60, acceleration: 3, newPolyline: false }).save();
+                if (this.currentTime.getValue() !== 0 && this.isNeedToCreateNewCar(interval)) {
+                    await new Car({id: this.carId += 1, polylineId: polyline.objectId, coordinates: [1,2], speed: 60, position: 0, acceleration: 3, newPolyline: false }).save();
                 }
             })
             resolve();
@@ -155,7 +156,7 @@ class InitHandler {
 
     /** @desc программа запущена (время от 0 до 3600 секунд с шагом 0.3) */
     get isRunning() {
-        return this.currentTime.getValue() <= 100950;
+        return this.currentTime.getValue() <= 10;
     }
 /*
     async operate() {

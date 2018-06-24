@@ -3,6 +3,7 @@ CREATE TABLE cars (
     polyline_id         int NOT NULL,
     coordinates         numeric[],
     speed               numeric,
+    position            numeric,
     acceleration        numeric,
     new_polyline        boolean
 );

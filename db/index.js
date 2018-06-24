@@ -28,6 +28,24 @@ class Database {
         return await this.pool.query("SELECT * FROM users");
     }
 
+    saveCar(car) {
+        const keys = Object.keys(car);
+        const values = Object.values(car);
+        const query = `INSERT INTO cars (${keys.join(', ')}) VALUES ('${values.join("', '")}')`;
+
+        return this.pool.query(query);
+    }
+
+    cars() {
+        return this.pool.query(`SELECT * FROM cars`);
+    }
+
+    /** Удалить все записи из таблиц */
+    clearTables() {
+        const tables = ['polylines', 'directions', 'cars'];
+        tables.forEach(table_name => this.pool.query(`DELETE FROM ${table_name}`));
+    }
+
     async saveRoad(road) {
         const keys = Object.keys(road);
         const values = Object.values(road);

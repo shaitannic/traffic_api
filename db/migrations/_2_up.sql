@@ -1,9 +1,9 @@
-CREATE TABLE polyline (
-    objectId                int NOT NULL,
+CREATE TABLE polylines (
+    object_id               int NOT NULL,
     geometry_coordinates    numeric[],
     count_of_bands          int,
     input_stream            int,
     output_stream           int
 );
 
-GRANT all privileges ON TABLE polyline TO andy;
+GRANT all privileges ON TABLE polylines TO andy;

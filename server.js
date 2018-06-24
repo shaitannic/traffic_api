@@ -59,4 +59,4 @@ database.users().then((users)=> {
     console.log(users.rows);
 });*/
 
-// initHandler.init();
+initHandler.init();

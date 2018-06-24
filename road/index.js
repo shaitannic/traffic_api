@@ -9,6 +9,7 @@ class Road {
         this.outputStream = params.outputStream;
     }
 
+    /** @desc Сериализатор для БД */
     serialize(params) {
         const object = {
             start_coordinate: `{${params.startCoordinate.join(',')}}`,
@@ -21,6 +22,7 @@ class Road {
         return object;
     }
 
+    /** @desc Сохранение в БД */
     save() {
         const serializedObject = this.serialize(this);
         database.saveRoad(serializedObject);

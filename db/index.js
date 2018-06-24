@@ -35,6 +35,14 @@ class Database {
         return this.pool.query(`SELECT * FROM cars`);
     }
 
+    getCarsForPolyline(car) {
+        return this.pool.query(`SELECT * FROM cars
+                                WHERE polyline_id = ${car.polylineId}
+                                AND position > ${car.position}
+                                ORDER BY position
+                                LIMIT 1`);
+    }
+
     /** Удалить все записи из таблиц */
     clearTables() {
         const tables = ['polylines', 'directions', 'cars'];

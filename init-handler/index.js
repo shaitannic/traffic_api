@@ -54,10 +54,11 @@ class InitHandler {
     /** @desc инициализация автомата */
     async init(items) {
         await database.clearTables();
+        debugger;
         await new Car({id: this.carId += 1, polylineId: 1, coordinates: [1,2], speed: 60, position: 0, acceleration: 3, newPolyline: false }).save();
-        await new Car({id: this.carId += 1, polylineId: 2, coordinates: [1,2], speed: 60, position: 0, acceleration: 3, newPolyline: false }).save();
-        await new Car({id: this.carId += 1, polylineId: 3, coordinates: [1,2], speed: 60, position: 0, acceleration: 3, newPolyline: false }).save();
-        await new Car({id: this.carId += 1, polylineId: 4, coordinates: [1,2], speed: 60, position: 0, acceleration: 3, newPolyline: false }).save();
+        // await new Car({id: this.carId += 1, polylineId: 2, coordinates: [1,2], speed: 60, position: 0, acceleration: 3, newPolyline: false }).save();
+        // await new Car({id: this.carId += 1, polylineId: 3, coordinates: [1,2], speed: 60, position: 0, acceleration: 3, newPolyline: false }).save();
+        // await new Car({id: this.carId += 1, polylineId: 4, coordinates: [1,2], speed: 60, position: 0, acceleration: 3, newPolyline: false }).save();
 
         while (this.isRunning) {
             await this.createCars();
@@ -78,12 +79,13 @@ class InitHandler {
         return new Promise(resolve => {
             resolve(
                 new Promise(resolve => resolve(car))
-            // .then(car => this.checkIsTurnedToNewPolyline(car))
-            // .then(car => this.isThereCarAhead(ca))
-            // .then(car => this.checkIsNearToCrossroad(car))
-            // .then(car => this.checkIsNeedToChangePolyline(car))
-            .then(car => this.checkIsCanAccelerate(car))
-            .then(car => car.update()))
+                .then(car => this.checkIsTurnedToNewPolyline(car))
+                .then(car => this.isThereCarAhead(car))
+                // .then(car => this.checkIsNearToCrossroad(car))
+                // .then(car => this.checkIsNeedToChangePolyline(car))
+                .then(car => this.checkIsCanAccelerate(car))
+                .then(car => car.update())
+            )
         })
         
     }
@@ -91,17 +93,21 @@ class InitHandler {
     /** @desc Проверить. Автомобиль повернул на новый перегон */
     checkIsTurnedToNewPolyline(car) {
         if (car.isTurnedToNewPolyline) {
-
+            // do something
         }
         
-        car.polyline_id = car.polyline_id + 10;
         return new Promise(resolve => resolve(car))
     }
 
     isThereCarAhead(car) {
-        if (car.isThereCarAhead) {
+        car.getCarAhead().then((data) => {
+            console.log('-------current------');
+            console.log(car.position)
+            console.log('---------ahead-------');
+            console.log(data.rows[0]);
+        })
 
-        }
+        return new Promise(resolve => resolve(car));
     }
 
     checkIsNearToCrossroad(car) {
@@ -156,7 +162,7 @@ class InitHandler {
 
     /** @desc программа запущена (время от 0 до 3600 секунд с шагом 0.3) */
     get isRunning() {
-        return this.currentTime.getValue() <= 10;
+        return this.currentTime.getValue() <= 5;
     }
 /*
     async operate() {

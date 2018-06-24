@@ -60,8 +60,8 @@ class Car {
     }
 
     /** @desc Проверка. Впереди есть автомобиль */
-    get isThereCarAhead() {
-        return false;
+    getCarAhead() {
+        return database.getCarsForPolyline(this);
     }
 
     /** @desc Проверка. Автомобиль приблизился к перекрестку */

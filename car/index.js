@@ -61,7 +61,12 @@ class Car {
 
     /** @desc Проверка. Впереди есть автомобиль */
     getCarAhead() {
-        return database.getCarsForPolyline(this);
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(this);
+            }, 1000)
+        })
+        // return database.getCarsForPolyline(this);
     }
 
     /** @desc Проверка. Автомобиль приблизился к перекрестку */
@@ -76,7 +81,11 @@ class Car {
 
     /** @desc Проверка. Можно ускориться (увеличить скорость) */
     get isCanAccelarate() {
-        return true;
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve(this)
+            }, 1000)
+        });
     }
 
     /*

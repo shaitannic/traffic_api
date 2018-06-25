@@ -61,33 +61,32 @@ class InitHandler {
         // await new Car({id: this.carId += 1, polylineId: 4, coordinates: [1,2], speed: 60, position: 0, acceleration: 3, newPolyline: false }).save();
 
         while (this.isRunning) {
-            await this.createCars();
-            await new Promise(resolve => {
-                Car.getAll().then(cars => {
-                    cars.forEach(async car => {
-                        await this.updateState(car);
-                        this.goToNextTimeStep();
-                        resolve(true);
-                    });
-                });
-            })
+            // await this.createCars();
+                let cars = await Car.getAll();
+                for(let i = 0; i < cars.length; i ++) {
+                    let car = cars[i];
+                    await this.updateState(car);
+                    this.goToNextTimeStep();
+                }
         }
     }
 
+    /*
+    for(let i = 0; i < cars.length; i ++) {
+                    let car = cars[i];
+                    car = await this.isThereCarAhead(car)
+                    car = await this.checkIsCanAccelerate(car)
+                    this.goToNextTimeStep();
+                }*/
+
     /** @desc обновить состояние автомобиля */
-    updateState(car) {
-        return new Promise(resolve => {
-            resolve(
-                new Promise(resolve => resolve(car))
-                .then(car => this.checkIsTurnedToNewPolyline(car))
-                .then(car => this.isThereCarAhead(car))
-                // .then(car => this.checkIsNearToCrossroad(car))
-                // .then(car => this.checkIsNeedToChangePolyline(car))
-                .then(car => this.checkIsCanAccelerate(car))
-                .then(car => car.update())
-            )
-        })
-        
+    async updateState(car) {
+        // car = await this.checkIsTurnedToNewPolyline(car)
+        car = await this.isThereCarAhead(car)
+        // .then(car => this.checkIsNearToCrossroad(car))
+        // .then(car => this.checkIsNeedToChangePolyline(car))
+        car = await this.checkIsCanAccelerate(car)
+        await car.update()
     }
 
     /** @desc Проверить. Автомобиль повернул на новый перегон */
@@ -99,15 +98,9 @@ class InitHandler {
         return new Promise(resolve => resolve(car))
     }
 
-    isThereCarAhead(car) {
-        car.getCarAhead().then((data) => {
-            console.log('-------current------');
-            console.log(car.position)
-            console.log('---------ahead-------');
-            console.log(data.rows[0]);
-        })
-
-        return new Promise(resolve => resolve(car));
+    async isThereCarAhead(car) {
+        car = await car.getCarAhead();
+        return car;
     }
 
     checkIsNearToCrossroad(car) {
@@ -128,14 +121,15 @@ class InitHandler {
         return new Promise(resolve => resolve(car));
     }
 
-    checkIsCanAccelerate(car) {
-        if (car.isCanAccelarate) {
+    async checkIsCanAccelerate(car) {
+        car = await car.isCanAccelarate;
+        if (isCanAccelerate) {
             const time = this.currentTime.getValue();
             car.position = Number(car.position) + Number(car.speed) * time + Number(car.acceleration) * time * time / 2;
             car.speed = Number(car.speed) + car.acceleration * 0.3;
         }
-        
-        return new Promise(resolve => resolve(car));
+
+        return car;
     }
 
     get isInitial() {

@@ -39,6 +39,10 @@ class Database {
         return this.pool.query(query);
     }
 
+    deleteCar(car) {
+        return this.pool.query(`DELETE FROM cars WHERE id = ${car.id}`); 
+    }
+
     cars() {
         return this.pool.query(`SELECT * FROM cars`);
     }
@@ -47,7 +51,11 @@ class Database {
         return this.pool.query(`SELECT * FROM polylines`);
     }
 
-    getCarsForPolyline(car) {
+    getPolylineById(id) {
+        return this.pool.query(`SELECT * FROM polylines WHERE objectId = ${id}`)
+    }
+
+    getCarAhead(car) {
         return this.pool.query(`SELECT * FROM cars
                                 WHERE polyline_id = ${car.polylineId}
                                 AND position > ${car.position}

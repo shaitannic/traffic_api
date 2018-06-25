@@ -11,8 +11,6 @@ class InitHandler {
         this.currentTime = new BehaviorSubject(0);
         this.cars = [];
         this.carId = 0;
-
-        
     }
 
     /** @desc инициализация автомата */
@@ -29,6 +27,7 @@ class InitHandler {
                 this.goToNextTimeStep();
             }
         }
+        console.log('done');
     }
 
     async initialize() {
@@ -40,27 +39,23 @@ class InitHandler {
 
     /** @desc обновить состояние автомобиля */
     async updateState(car) {
-        car = await this.checkIsTurnedToNewPolyline(car)
-        car = await this.isThereCarAhead(car)
+        /*if (car.isTurnedToNewPolyline) {    // автомобиль повернул на новый полигон
+            if (car.mustBeDropped) {
+                await car.delete();
+            }
+        }*/
+
+        debugger
+        let carAhead = await car.getCarAhead();
+        if (carAhead) {
+            console.log(carAhead);
+        }
+/*
         car = await this.checkIsNearToCrossroad(car)
         car = await this.checkIsNeedToChangePolyline(car)
         car = await this.checkIsCanAccelerate(car)
         await car.update();
-        return new Promise(resolve => resolve());
-    }
-
-    /** @desc Проверить. Автомобиль повернул на новый перегон */
-    checkIsTurnedToNewPolyline(car) {
-        if (car.isTurnedToNewPolyline) {
-            // do something
-        }
-
-        return new Promise(resolve => resolve(car))
-    }
-
-    async isThereCarAhead(car) {
-        car = await car.getCarAhead();
-        return new Promise(resolve => resolve(car));
+        return new Promise(resolve => resolve());*/
     }
 
     checkIsNearToCrossroad(car) {

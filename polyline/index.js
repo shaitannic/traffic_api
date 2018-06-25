@@ -9,13 +9,19 @@ class Polyline {
         this.outputStream = params.outputStream || params.output_stream;
     }
 
-    static async getAll () {
+    static async getAll() {
         let data = await database.polylines();
         let polylines = [];
 
         data.rows.forEach(params => polylines.push(new Polyline(params)));
 
         return new Promise(resolve => resolve(polylines));
+    }
+
+    static async getById(id) {
+        let data = await database.getPolylineById(id);
+        let polyline = new Polyline(data.rows);
+        return new Promise(resolve => resolve(polyline));
     }
 
     /** @desc Сериализатор для БД */

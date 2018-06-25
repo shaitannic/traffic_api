@@ -1,4 +1,6 @@
 const { database } = require('../db');
+const RandomHelper = require('../helpers/random.helper');
+const Polyline = require('../polyline');
 
 class Car {
     constructor(params) {
@@ -44,6 +46,12 @@ class Car {
         return database.saveCar(serializedObject);
     }
 
+    /** @desc Удалить из БД */
+    delete() {
+        const serializedObject = this.serialize(this);
+        return database.deleteCar(car);
+    }
+
     /** @desc Обновить автомобиль */
     update() {
         const serializedObject = this.serialize(this);
@@ -56,18 +64,29 @@ class Car {
 
     /** @desc Проверка. Автомобиль повернул на новый перегон */
     get isTurnedToNewPolyline() {
-        // return this.newPolyline;
+        return this.newPolyline;
+    }
+
+    /** @desc Проверка. Автомобиль должен быть уничтожен */
+    async mustBeDropped() {
+        /*let polyline = await Polyline.getById(this.polylineId);
+
+        let inputStream = polyline.inputStream;
+        let outputStream = polyline.outputStream;
+
+        if (inputStream < outputStream) {
+            return false;
+        } else {
+            return RandomHelper.canBeSelected(probability);
+        }*/
         return false;
     }
 
-    /** @desc Проверка. Впереди есть автомобиль */
-    getCarAhead() {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(this);
-            }, 1000)
-        })
-        // return database.getCarsForPolyline(this);
+    /** @desc Получить впередиидущий автомобиль */
+    async getCarAhead() {
+        let data = await database.getCarAhead(this);
+        let car = data.rows[0];
+        return new Promise(resolve => resolve(car));
     }
 
     /** @desc Проверка. Автомобиль приблизился к перекрестку */

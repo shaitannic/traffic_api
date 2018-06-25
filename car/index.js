@@ -25,6 +25,16 @@ class Car {
         })
     }
 
+    /** @desc текущее расстояние между машинами */
+    static getCurrentDistance(car, carAhead) {
+        return carAhead.position - car.position;
+    }
+
+    /** @desc безопасное расстояние между машинами */
+    static getSafetyDistance(car) {
+        return car.speed * car.speed / (2 * car.accelarate);
+    }
+
     /** @desc Сериализатор для БД */
     serialize(params) {
         const object = {
@@ -56,6 +66,20 @@ class Car {
     update() {
         const serializedObject = this.serialize(this);
         return database.updateCar(serializedObject);
+    }
+
+    /** @desc Тормозить */
+    brake() {
+        const time = 0.3
+
+        this.position = Number(this.position) + Number(this.speed) * time + Number(- this.acceleration) * time * time / 2;
+        this.speed = Number(this.speed) - this.acceleration * time;
+    }
+
+    accelarate() {
+        const time = 0.3;
+        this.position = Number(this.position) + Number(this.speed) * time + Number(this.acceleration) * time * time / 2;
+        this.speed = Number(this.speed) + this.acceleration * step;
     }
 
     /*async get currentPolyline() {

@@ -63,27 +63,32 @@ class Database {
                                 LIMIT 1`);
     }
 
+    saveResult(result) {
+        const keys = Object.keys(result);
+        const values = Object.values(result);
+        const query = `INSERT INTO results (${keys.join(', ')}) VALUES ('${values.join("', '")}')`;
+
+        return this.pool.query(query);
+    }
+
+    updateResult(result) {
+        const keys = Object.keys(result);
+        const values = Object.values(result);
+        const query = `UPDATE results SET (${keys.join(', ')}) = ('${values.join("', '")}') WHERE id = ${result.id}`;
+
+        return this.pool.query(query);
+    }
+
+    getResultById(id) {
+        return this.pool.query(`SELECT * FROM results WHERE car_id = ${id}`)
+    }
+
     /** Удалить все записи из таблиц */
     async clearTables() {
         const tables = ['polylines', 'directions', 'cars'];
         for (let i = 0; i < tables.length; i ++) {
             await this.pool.query(`DELETE FROM ${tables[i]}`);
         }
-    }
-
-    async saveRoad(road) {
-        const keys = Object.keys(road);
-        const values = Object.values(road);
-        const query = `INSERT INTO roads (${keys.join(', ')}) VALUES ('${values.join("', '")}')`;
-
-        return await this.pool.query(query).then(
-            result => {
-                console.log('success');
-                console.log(result);
-            },
-            error => {
-                console.log(error);
-            });
     }
 
     async end() {

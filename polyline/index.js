@@ -20,7 +20,7 @@ class Polyline {
 
     static async getById(id) {
         let data = await database.getPolylineById(id);
-        let polyline = new Polyline(data.rows);
+        let polyline = new Polyline(data.rows[0]);
         return new Promise(resolve => resolve(polyline));
     }
 

@@ -3,12 +3,13 @@ const { takeUntil }         = require('rxjs/Operator');
 const { database }          = require('../db');
 const Car = require('../car');
 const Polyline = require('../polyline');
+const Result = require('../result');
 
 const step = 1;
 
 class InitHandler {
     constructor() {
-        this.currentTime = new BehaviorSubject(0);
+        this.currentTime = 1;
         this.cars = [];
         this.carId = 0;
     }
@@ -32,9 +33,10 @@ class InitHandler {
 
     async initialize() {
         await database.clearTables();
-
         await this.createInitialPolylines();
         await this.createInitialCars();
+
+        return new Promise(resolve => resolve());
     }
 
     /** @desc обновить состояние автомобиля */
@@ -48,49 +50,70 @@ class InitHandler {
         debugger
         let carAhead = await car.getCarAhead();
         if (carAhead) {
-            console.log(carAhead);
+            let currentDistance = Car.getCurrentDistance(car, carAhead);
+            let safetyDistance = Car.getSafetyDistance(car);
+            if (currentDistance < safetyDistance) {
+                car.brake();
+            } else {
+                car = await this.checkIsCanAccelerate(car)
+            }
+        } else {
+            car = await this.checkIsNearToCrossroad(car)
         }
-/*
-        car = await this.checkIsNearToCrossroad(car)
-        car = await this.checkIsNeedToChangePolyline(car)
-        car = await this.checkIsCanAccelerate(car)
+
         await car.update();
-        return new Promise(resolve => resolve());*/
+        await this.checkIsFinished(car);
+        return new Promise(resolve => resolve());
     }
 
-    checkIsNearToCrossroad(car) {
-        if (car.isNearToCrossroad) {
-            // todo update car state
+    async checkIsFinished(car) {
+        let polyline = await Polyline.getById(car.polyline);
+
+        if (polyline.length < car.position) {
+            let result = await Result.getById(car.id);
+            result.endTime = this.currentTime;
+            await result.update();
+            await car.delete();
+        }
+        return new Promise(resolve => resolve(car));
+    }
+
+    async checkIsNearToCrossroad(car) {
+        let currentDistanceToTrafficLights = TrafficLight.getCurrentDistanceFor(car); // todo получить расстояние до светофора
+        let safetyDistanceToTrafficLight = TrafficLight.getSafetyDistance(car);
+
+        if (currentDistanceToTrafficLights < safetyDistanceToTrafficLight) {
+            car.brake();
+        } else {
+            car = await this.checkIsCanAccelerate(car)
         }
 
         return new Promise(resolve => resolve(car));
     }
 
-    checkIsNeedToChangePolyline(car) {
+    /*checkIsNeedToChangePolyline(car) {
         if (car.isNeedToChangePolyline) {
             // todo update car state
         }
 
         return new Promise(resolve => resolve(car));
-    }
+    }*/
 
     async checkIsCanAccelerate(car) {
-        if (car.isCanAccelerate) {
-            const time = this.currentTime.getValue();
-            car.position = Number(car.position) + Number(car.speed) * time + Number(car.acceleration) * time * time / 2;
-            car.speed = Number(car.speed) + car.acceleration * 0.3;
+        if (car.speed < 80) {
+            car.accelerate();
         }
 
         return new Promise(resolve => resolve(car));
     }
 
     get isInitial() {
-        return this.currentTime.getValue() === 0;
+        return this.currentTime === 0;
     }
 
     /** @desc нужно создать новую машину */
     isNeedToCreateNewCar(interval) {
-        return this.currentTime.getValue() >= step && (this.currentTime.getValue() + 0.01) % interval < step;
+        return this.currentTime >= step && (this.currentTime + 0.01) % interval < step;
     }
 
     async createInitialPolylines() {
@@ -105,25 +128,34 @@ class InitHandler {
     async createInitialCars() {
         for (let i = 0; i < this.polylines.length; i ++) {
             let polyline = this.polylines[i];
-            await new Car({id: parseInt(this.carId += 1), polylineId: parseInt(polyline.objectId), coordinates: [1,2], speed: 60, position: 0, acceleration: 3, newPolyline: false }).save();
+            let id = this.carId += 1;
+
+            await new Car({id: parseInt(id), polylineId: parseInt(polyline.objectId), coordinates: [0,0], speed: 0, position: 0, acceleration: 3, newPolyline: false }).save();
+            await new Result({carId: parseInt(id), polylineId: parseInt(polyline.objectId), startTime: this.currentTime, endTime: 1 }).save();
         }
+
+        return new Promise(resolve => resolve());
     }
 
     async createCars() {
         for(let i = 0; i < this.polylines.length; i ++) {
             let polyline = this.polylines[i];
-            let interval = ~~(3600 / polyline.inputStream);
+            let interval = ~~(3600 / polyline.outputStream);
 
-            if (this.currentTime.getValue() !== 0 && this.isNeedToCreateNewCar(interval)) {
-                await new Car({id: this.carId += 1, polylineId: parseInt(polyline.objectId), coordinates: [1,2], speed: 60, position: 0, acceleration: 3, newPolyline: false }).save();
+            if (this.currentTime !== 0 && this.isNeedToCreateNewCar(interval)) {
+                let id = this.carId += 1;
+
+                await new Car({id: id, polylineId: parseInt(polyline.objectId), coordinates: [0,0], speed: 0, position: 0, acceleration: 3, newPolyline: false }).save();
+                await new Result({carId: parseInt(id), polylineId: parseInt(polyline.objectId), startTime: this.currentTime, endTime: 1 }).save();
             }
         }
+
         return new Promise(resolve => resolve());
     }
 
     /** @desc программа запущена (время от 0 до 3600 секунд с шагом 0.3) */
     get isRunning() {
-        return this.currentTime.getValue() <= 5;
+        return this.currentTime <= 5;
     }
 /*
     async operate() {
@@ -132,7 +164,7 @@ class InitHandler {
 
     /** @desc увеличить временной шаг на 0,3 */
     goToNextTimeStep() {
-        this.currentTime.next(this.currentTime.getValue() + step);
+        this.currentTime = this.currentTime + step;
     }
 }
 

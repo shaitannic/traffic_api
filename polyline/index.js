@@ -42,6 +42,10 @@ class Polyline {
         const serializedObject = this.serialize(this);
         return database.savePolyline(serializedObject);
     }
+
+    get length() {
+        return 1000;
+    }
 }
 
 module.exports = Polyline;

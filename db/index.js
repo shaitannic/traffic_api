@@ -52,7 +52,7 @@ class Database {
     }
 
     getPolylineById(id) {
-        return this.pool.query(`SELECT * FROM polylines WHERE objectId = ${id}`)
+        return this.pool.query(`SELECT * FROM polylines WHERE object_id = ${id}`)
     }
 
     getCarAhead(car) {
@@ -74,7 +74,7 @@ class Database {
     updateResult(result) {
         const keys = Object.keys(result);
         const values = Object.values(result);
-        const query = `UPDATE results SET (${keys.join(', ')}) = ('${values.join("', '")}') WHERE id = ${result.id}`;
+        const query = `UPDATE results SET (${keys.join(', ')}) = ('${values.join("', '")}') WHERE car_id = ${result.car_id}`;
 
         return this.pool.query(query);
     }
@@ -85,7 +85,7 @@ class Database {
 
     /** Удалить все записи из таблиц */
     async clearTables() {
-        const tables = ['polylines', 'directions', 'cars'];
+        const tables = ['polylines', 'directions', 'cars', 'results'];
         for (let i = 0; i < tables.length; i ++) {
             await this.pool.query(`DELETE FROM ${tables[i]}`);
         }

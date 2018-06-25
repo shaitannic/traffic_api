@@ -32,7 +32,7 @@ class Car {
 
     /** @desc безопасное расстояние между машинами */
     static getSafetyDistance(car) {
-        return car.speed * car.speed / (2 * car.accelarate);
+        return car.speed * car.speed / (2 * car.acceleration);
     }
 
     /** @desc Сериализатор для БД */
@@ -59,7 +59,7 @@ class Car {
     /** @desc Удалить из БД */
     delete() {
         const serializedObject = this.serialize(this);
-        return database.deleteCar(car);
+        return database.deleteCar(this);
     }
 
     /** @desc Обновить автомобиль */
@@ -76,10 +76,10 @@ class Car {
         this.speed = Number(this.speed) - this.acceleration * time;
     }
 
-    accelarate() {
+    accelerate() {
         const time = 0.3;
         this.position = Number(this.position) + Number(this.speed) * time + Number(this.acceleration) * time * time / 2;
-        this.speed = Number(this.speed) + this.acceleration * step;
+        this.speed = Number(this.speed) + this.acceleration * time;
     }
 
     /*async get currentPolyline() {

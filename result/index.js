@@ -10,8 +10,8 @@ class Result {
 
     static async getById(id) {
         let data = await database.getResultById(id);
-        let polyline = new Polyline(data.rows[0]);
-        return new Promise(resolve => resolve(polyline));
+        let result = new Result(data.rows[0]);
+        return new Promise(resolve => resolve(result));
     }
 
     /** @desc Сериализатор для БД */
@@ -30,6 +30,12 @@ class Result {
     save() {
         const serializedObject = this.serialize(this);
         return database.saveResult(serializedObject);
+    }
+
+    /** @desc Обновить результат */
+    update() {
+        const serializedObject = this.serialize(this);
+        return database.updateResult(serializedObject);
     }
 }
 

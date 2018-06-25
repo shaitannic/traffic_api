@@ -4,8 +4,9 @@ const { database }          = require('../db');
 const Car = require('../car');
 const Polyline = require('../polyline');
 const Result = require('../result');
+const TrafficLight = require('../traffic-light');
 
-const step = 1;
+const step = 0.3;
 
 class InitHandler {
     constructor() {
@@ -47,7 +48,7 @@ class InitHandler {
             }
         }*/
 
-        debugger
+        // debugger
         let carAhead = await car.getCarAhead();
         if (carAhead) {
             let currentDistance = Car.getCurrentDistance(car, carAhead);
@@ -67,7 +68,7 @@ class InitHandler {
     }
 
     async checkIsFinished(car) {
-        let polyline = await Polyline.getById(car.polyline);
+        let polyline = await Polyline.getById(car.polylineId);
 
         if (polyline.length < car.position) {
             let result = await Result.getById(car.id);
@@ -80,7 +81,7 @@ class InitHandler {
 
     async checkIsNearToCrossroad(car) {
         let currentDistanceToTrafficLights = TrafficLight.getCurrentDistanceFor(car); // todo получить расстояние до светофора
-        let safetyDistanceToTrafficLight = TrafficLight.getSafetyDistance(car);
+        let safetyDistanceToTrafficLight = Car.getSafetyDistance(car);
 
         if (currentDistanceToTrafficLights < safetyDistanceToTrafficLight) {
             car.brake();
@@ -130,7 +131,7 @@ class InitHandler {
             let polyline = this.polylines[i];
             let id = this.carId += 1;
 
-            await new Car({id: parseInt(id), polylineId: parseInt(polyline.objectId), coordinates: [0,0], speed: 0, position: 0, acceleration: 3, newPolyline: false }).save();
+            await new Car({id: parseInt(id), polylineId: parseInt(polyline.objectId), coordinates: [0,0], speed: 1, position: 0, acceleration: 3, newPolyline: false }).save();
             await new Result({carId: parseInt(id), polylineId: parseInt(polyline.objectId), startTime: this.currentTime, endTime: 1 }).save();
         }
 
@@ -145,7 +146,7 @@ class InitHandler {
             if (this.currentTime !== 0 && this.isNeedToCreateNewCar(interval)) {
                 let id = this.carId += 1;
 
-                await new Car({id: id, polylineId: parseInt(polyline.objectId), coordinates: [0,0], speed: 0, position: 0, acceleration: 3, newPolyline: false }).save();
+                await new Car({id: id, polylineId: parseInt(polyline.objectId), coordinates: [0,0], speed: 1, position: 0, acceleration: 3, newPolyline: false }).save();
                 await new Result({carId: parseInt(id), polylineId: parseInt(polyline.objectId), startTime: this.currentTime, endTime: 1 }).save();
             }
         }
@@ -155,7 +156,7 @@ class InitHandler {
 
     /** @desc программа запущена (время от 0 до 3600 секунд с шагом 0.3) */
     get isRunning() {
-        return this.currentTime <= 5;
+        return this.currentTime <= 1000;
     }
 /*
     async operate() {

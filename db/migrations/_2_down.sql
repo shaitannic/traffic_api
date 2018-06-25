@@ -1,1 +1,1 @@
-DROP TABLE polyline;
+DROP TABLE polylines;

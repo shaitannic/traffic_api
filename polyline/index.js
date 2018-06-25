@@ -2,19 +2,27 @@ const { database } = require('../db');
 
 class Polyline {
     constructor(params) {
-        this.objectId = params.objectId;
-        this.length = params.length;
-        this.geometryCoordinates = params.geometryCoordinates;
-        this.countOfBands = params.countOfBands;
-        this.inputStream = params.inputStream;
-        this.outputStream = params.outputStream;
+        this.objectId = params.objectId || params.object_id;
+        this.geometryCoordinates = params.geometryCoordinates || params.geometry_coordinates;
+        this.countOfBands = params.countOfBands || params.count_of_bands;
+        this.inputStream = params.inputStream || params.input_stream;
+        this.outputStream = params.outputStream || params.output_stream;
+    }
+
+    static async getAll () {
+        let data = await database.polylines();
+        let polylines = [];
+
+        data.rows.forEach(params => polylines.push(new Polyline(params)));
+
+        return new Promise(resolve => resolve(polylines));
     }
 
     /** @desc Сериализатор для БД */
     serialize(params) {
         const object = {
-            start_coordinate: `{${params.startCoordinate.join(',')}}`,
-            end_coordinate: `{${params.endCoordinate.join(',')}}`,
+            object_id: params.objectId,
+            geometry_coordinates: `{${params.geometryCoordinates.join(',')}}`,
             count_of_bands: params.countOfBands,
             input_stream: params.inputStream,
             output_stream: params.outputStream
@@ -26,7 +34,7 @@ class Polyline {
     /** @desc Сохранение в БД */
     save() {
         const serializedObject = this.serialize(this);
-        database.savePolyline(serializedObject);
+        return database.savePolyline(serializedObject);
     }
 }
 

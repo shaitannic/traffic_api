@@ -23,6 +23,14 @@ class Database {
         return this.pool.query(query);
     }
 
+    savePolyline(polyline) {
+        const keys = Object.keys(polyline);
+        const values = Object.values(polyline);
+        const query = `INSERT INTO polylines (${keys.join(', ')}) VALUES ('${values.join("', '")}')`;
+
+        return this.pool.query(query);
+    }
+
     updateCar(car) {
         const keys = Object.keys(car);
         const values = Object.values(car);
@@ -35,6 +43,10 @@ class Database {
         return this.pool.query(`SELECT * FROM cars`);
     }
 
+    polylines() {
+        return this.pool.query(`SELECT * FROM polylines`);
+    }
+
     getCarsForPolyline(car) {
         return this.pool.query(`SELECT * FROM cars
                                 WHERE polyline_id = ${car.polylineId}
@@ -44,9 +56,11 @@ class Database {
     }
 
     /** Удалить все записи из таблиц */
-    clearTables() {
+    async clearTables() {
         const tables = ['polylines', 'directions', 'cars'];
-        tables.forEach(table_name => this.pool.query(`DELETE FROM ${table_name}`));
+        for (let i = 0; i < tables.length; i ++) {
+            await this.pool.query(`DELETE FROM ${tables[i]}`);
+        }
     }
 
     async saveRoad(road) {

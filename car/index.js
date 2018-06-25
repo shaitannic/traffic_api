@@ -56,7 +56,8 @@ class Car {
 
     /** @desc Проверка. Автомобиль повернул на новый перегон */
     get isTurnedToNewPolyline() {
-        return this.newPolyline;
+        // return this.newPolyline;
+        return false;
     }
 
     /** @desc Проверка. Впереди есть автомобиль */
@@ -80,12 +81,13 @@ class Car {
     }
 
     /** @desc Проверка. Можно ускориться (увеличить скорость) */
-    get isCanAccelarate() {
-        return new Promise(resolve => {
+    get isCanAccelerate() {
+        /*return new Promise(resolve => {
             setTimeout(() => {
                 resolve(this)
             }, 1000)
-        });
+        });*/
+        return true;
     }
 
     /*

@@ -1,12 +1,12 @@
 const { database } = require('../db');
-const position = 1000;
+const CONSTS = require('../consts');
 
 class TrafficLight {
     constructor(params) {
         this.id = params.id;
         this.coordinates = params.coordinates;
         this.periodTime = params.periodTime || params.period_time;
-        this.isRed = params.isRed || params.is_red;
+        this.isRed = params.isRed;
     }
 
     static async getById(id) {
@@ -17,7 +17,16 @@ class TrafficLight {
 
     async getCurrentDistanceFor(car) {
         // let trafficLight = await TrafficLight.getById(1);
-        return position - car.position;
+        return CONSTS.polylineLength - car.position;
+    }
+
+    isAllowedTraffic(car) {
+        switch(car.polylineId) {
+            case 1: return this.isRed;
+            case 2: return this.isRed;
+            case 3: return !this.isRed;
+            case 4: return !this.isRed;
+        }
     }
 
     toggleSignal() {
@@ -34,6 +43,18 @@ class TrafficLight {
         }
 
         return object;
+    }
+
+    async next() {
+        if (this.periodTime < CONSTS.trafficInterval) {
+            this.periodTime += CONSTS.step;
+        } else {
+            this.periodTime = 0; 
+            this.toggleSignal();
+        }
+        await this.update();
+
+        return new Promise(resolve => resolve());
     }
 
     /** @desc Сохранение в БД */

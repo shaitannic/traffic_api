@@ -1,4 +1,5 @@
 const { database } = require('../db');
+const CONSTS = require('../consts');
 
 class Polyline {
     constructor(params) {
@@ -44,7 +45,7 @@ class Polyline {
     }
 
     get length() {
-        return 1000;
+        return CONSTS.polylineLength;
     }
 }
 

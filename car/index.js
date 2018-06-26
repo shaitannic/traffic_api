@@ -1,6 +1,7 @@
 const { database } = require('../db');
 const RandomHelper = require('../helpers/random.helper');
 const Polyline = require('../polyline');
+const CONSTS = require('../consts');
 
 class Car {
     constructor(params) {
@@ -70,16 +71,13 @@ class Car {
 
     /** @desc Тормозить */
     brake() {
-        const time = 0.3
-
-        this.position = Number(this.position) + Number(this.speed) * time + Number(- this.acceleration) * time * time / 2;
-        this.speed = Number(this.speed) - this.acceleration * time;
+        this.position = Number(this.position) + Number(this.speed) * CONSTS.step + Number(- this.acceleration) * CONSTS.step * CONSTS.step / 2;
+        this.speed = Number(this.speed) - this.acceleration * CONSTS.step;
     }
 
     accelerate() {
-        const time = 0.3;
-        this.position = Number(this.position) + Number(this.speed) * time + Number(this.acceleration) * time * time / 2;
-        this.speed = Number(this.speed) + this.acceleration * time;
+        this.position = Number(this.position) + Number(this.speed) * CONSTS.step + Number(this.acceleration) * CONSTS.step * CONSTS.step / 2;
+        this.speed = Number(this.speed) + this.acceleration * CONSTS.step;
     }
 
     /*async get currentPolyline() {

@@ -79,13 +79,33 @@ class Database {
         return this.pool.query(query);
     }
 
+    saveTrafficLight(trafficLight) {
+        const keys = Object.keys(trafficLight);
+        const values = Object.values(trafficLight);
+        const query = `INSERT INTO traffic_lights (${keys.join(', ')}) VALUES ('${values.join("', '")}')`;
+
+        return this.pool.query(query);
+    }
+
+    updateTrafficLight(trafficLight) {
+        const keys = Object.keys(trafficLight);
+        const values = Object.values(trafficLight);
+        const query = `UPDATE traffic_lights SET (${keys.join(', ')}) = ('${values.join("', '")}') WHERE id = ${trafficLight.id}`;
+
+        return this.pool.query(query);
+    }
+
+    getTrafficLightById(id) {
+        return this.pool.query(`SELECT * FROM traffic_lights WHERE id = ${id}`)
+    }
+
     getResultById(id) {
         return this.pool.query(`SELECT * FROM results WHERE car_id = ${id}`)
     }
 
     /** Удалить все записи из таблиц */
     async clearTables() {
-        const tables = ['polylines', 'directions', 'cars', 'results'];
+        const tables = ['polylines', 'directions', 'cars', 'results', 'traffic_lights'];
         for (let i = 0; i < tables.length; i ++) {
             await this.pool.query(`DELETE FROM ${tables[i]}`);
         }

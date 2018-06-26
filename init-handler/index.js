@@ -7,6 +7,7 @@ const Result = require('../result');
 const TrafficLight = require('../traffic-light');
 
 const step = 0.3;
+const trafficInterval = 15;
 
 class InitHandler {
     constructor() {
@@ -34,6 +35,7 @@ class InitHandler {
 
     async initialize() {
         await database.clearTables();
+        await this.createTrafficLights();
         await this.createInitialPolylines();
         await this.createInitialCars();
 
@@ -80,10 +82,10 @@ class InitHandler {
     }
 
     async checkIsNearToCrossroad(car) {
-        let currentDistanceToTrafficLights = TrafficLight.getCurrentDistanceFor(car); // todo получить расстояние до светофора
+        let currentDistanceToTrafficLights = await this.trafficLight.getCurrentDistanceFor(car); // todo получить расстояние до светофора
         let safetyDistanceToTrafficLight = Car.getSafetyDistance(car);
 
-        if (currentDistanceToTrafficLights < safetyDistanceToTrafficLight) {
+        if (currentDistanceToTrafficLights < safetyDistanceToTrafficLight && this.trafficLight.isRed) {
             car.brake();
         } else {
             car = await this.checkIsCanAccelerate(car)
@@ -115,6 +117,11 @@ class InitHandler {
     /** @desc нужно создать новую машину */
     isNeedToCreateNewCar(interval) {
         return this.currentTime >= step && (this.currentTime + 0.01) % interval < step;
+    }
+
+    async createTrafficLights() {
+        this.trafficLight = new TrafficLight({ id: 1, coordinates: [1000, 1000], isRed: false, periodTime: 0.1});
+        await this.trafficLight.save();
     }
 
     async createInitialPolylines() {
@@ -156,7 +163,7 @@ class InitHandler {
 
     /** @desc программа запущена (время от 0 до 3600 секунд с шагом 0.3) */
     get isRunning() {
-        return this.currentTime <= 1000;
+        return this.currentTime <= 5;
     }
 /*
     async operate() {
@@ -164,8 +171,16 @@ class InitHandler {
     }*/
 
     /** @desc увеличить временной шаг на 0,3 */
-    goToNextTimeStep() {
+    async goToNextTimeStep() {
         this.currentTime = this.currentTime + step;
+
+        if (this.trafficLight.periodTime < trafficInterval) {
+            this.trafficLight.periodTime = this.trafficLight.periodTime + step;
+        } else {
+            this.trafficLight.periodTime = 0; 
+            this.trafficLight.toggleSignal();
+        }
+        await this.trafficLight.update();
     }
 }
 
